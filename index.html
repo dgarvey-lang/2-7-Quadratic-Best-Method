@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quadratic Best Method Quiz</title>
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --text: #1d2433;
+    --muted: #5b6475;
+    --border: #d9dde7;
+    --accent: #2f5bd3;
+    --accent-soft: #e6ecfb;
+    --good: #1f8a4c;
+    --good-soft: #e3f4ea;
+    --warn: #a86500;
+    --warn-soft: #fbf0dc;
+    --bad: #c23b3b;
+    --bad-soft: #f9e3e3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c;
+      --card: #1b2029;
+      --text: #e7eaf0;
+      --muted: #9aa3b5;
+      --border: #2e3542;
+      --accent: #7a9bff;
+      --accent-soft: #232c45;
+      --good: #4cc483;
+      --good-soft: #17301f;
+      --warn: #e6a640;
+      --warn-soft: #33270f;
+      --bad: #ef7171;
+      --bad-soft: #3a1c1c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .methods div { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; font-size: 0.92rem; }
+  .methods b { display: block; }
+  .progress { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; margin-bottom: 8px; }
+  .bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
+  .bar span { display: block; height: 100%; background: var(--accent); transition: width .25s; }
+  .eq {
+    font: 600 1.6rem/1.3 "Cambria Math", "STIX Two Math", Georgia, serif;
+    text-align: center;
+    padding: 14px 0 18px;
+  }
+  .step { font-weight: 600; margin: 14px 0 8px; }
+  .opts { display: grid; gap: 8px; }
+  .opts.two { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 480px) { .opts.two { grid-template-columns: 1fr; } }
+  button.opt {
+    text-align: left;
+    font: inherit;
+    color: var(--text);
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+  }
+  button.opt:hover:not(:disabled) { border-color: var(--accent); }
+  button.opt:disabled { cursor: default; }
+  button.opt.sel-good { border-color: var(--good); background: var(--good-soft); }
+  button.opt.sel-ok { border-color: var(--warn); background: var(--warn-soft); }
+  button.opt.sel-bad { border-color: var(--bad); background: var(--bad-soft); }
+  button.opt.reveal { border-color: var(--good); border-style: dashed; }
+  .math { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 1.1rem; }
+  .fb { border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 0.95rem; }
+  .fb.good { background: var(--good-soft); }
+  .fb.ok { background: var(--warn-soft); }
+  .fb.bad { background: var(--bad-soft); }
+  .work { margin-top: 10px; font-size: 0.95rem; color: var(--muted); }
+  .work .math { color: var(--text); font-size: 1rem; }
+  .nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+  .btn {
+    font: inherit; font-weight: 600;
+    border: 0; border-radius: 8px;
+    padding: 10px 20px;
+    background: var(--accent); color: #fff;
+    cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) { .btn { color: #0f1320; } }
+  .btn.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .hidden { display: none; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .score { font-size: 2.4rem; font-weight: 700; text-align: center; margin: 6px 0; }
+  .tick { color: var(--good); font-weight: 700; }
+  .half { color: var(--warn); font-weight: 700; }
+  .cross { color: var(--bad); font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <h1>2-7 Quiz: Choosing the Best Method</h1>
+  <p class="sub">For each quadratic equation, first choose the most efficient method, then choose the correct solution(s).</p>
+
+  <section id="intro" class="card">
+    <p style="margin-top:0"><strong>The four methods</strong></p>
+    <div class="methods">
+      <div><b>Square roots</b>No x-term: ax² = c or (x − h)² = k</div>
+      <div><b>Factoring</b>Trinomial factors nicely, or there is no constant (GCF)</div>
+      <div><b>Completing the square</b>a = 1 and b is even, but it doesn't factor</div>
+      <div><b>Quadratic formula</b>Works for everything; best when a ≠ 1 and it doesn't factor</div>
+    </div>
+    <p>There are <strong id="qcount"></strong> questions, each worth 2 points (1 for the method, 1 for the solution).</p>
+    <div class="nav"><button class="btn" id="start">Start quiz</button></div>
+  </section>
+
+  <section id="quiz" class="hidden">
+    <div class="progress"><span id="qnum"></span><span id="running"></span></div>
+    <div class="bar"><span id="barfill"></span></div>
+    <div class="card">
+      <div class="eq" id="eq"></div>
+      <div class="step">Step 1 — Which method is best?</div>
+      <div class="opts two" id="methodOpts"></div>
+      <div id="methodFb"></div>
+      <div id="solveBlock" class="hidden">
+        <div class="step">Step 2 — What are the solutions?</div>
+        <div class="opts two" id="solOpts"></div>
+        <div id="solFb"></div>
+        <div class="work hidden" id="work"></div>
+      </div>
+      <div class="nav"><button class="btn" id="next" disabled>Next</button></div>
+    </div>
+  </section>
+
+  <section id="results" class="hidden">
+    <div class="card">
+      <p style="margin:0;text-align:center;color:var(--muted)">Your score</p>
+      <div class="score" id="final"></div>
+      <p style="text-align:center;margin-top:0" id="finalMsg"></p>
+      <table>
+        <thead><tr><th>#</th><th>Equation</th><th>Method</th><th>Solution</th></tr></thead>
+        <tbody id="summary"></tbody>
+      </table>
+      <div class="nav"><button class="btn secondary" id="retry">Try again</button></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const METHODS = ["Square roots", "Factoring", "Completing the square", "Quadratic formula"];
+
+// best: the most efficient method. ok: methods that also work well (full credit, with a tip).
+const QUESTIONS = [
+  {
+    eq: "x² = 49",
+    best: "Square roots", ok: [],
+    why: "There is no x-term, so just take the square root of both sides.",
+    answer: "x = ±7",
+    distractors: ["x = 7", "x = ±24.5", "x = ±49"],
+    work: "x = ±√49 = ±7"
+  },
+  {
+    eq: "x² + 5x + 6 = 0",
+    best: "Factoring", ok: [],
+    why: "a = 1 and two numbers multiply to 6 and add to 5 (2 and 3), so it factors quickly.",
+    answer: "x = −2, −3",
+    distractors: ["x = 2, 3", "x = −1, −6", "x = 1, 6"],
+    work: "(x + 2)(x + 3) = 0 → x = −2 or x = −3"
+  },
+  {
+    eq: "(x − 3)² = 16",
+    best: "Square roots", ok: [],
+    why: "It is already a perfect square equal to a number. Square root both sides — don't expand!",
+    answer: "x = 7, −1",
+    distractors: ["x = 7", "x = −7, 1", "x = 19, −13"],
+    work: "x − 3 = ±4 → x = 3 + 4 = 7 or x = 3 − 4 = −1"
+  },
+  {
+    eq: "2x² + 3x − 7 = 0",
+    best: "Quadratic formula", ok: [],
+    why: "a ≠ 1 and the discriminant (65) is not a perfect square, so it won't factor. Use the formula.",
+    answer: "x = (−3 ± √65) / 4",
+    distractors: ["x = (3 ± √65) / 4", "x = (−3 ± √47) / 4", "x = (−3 ± √65) / 2"],
+    work: "x = [−3 ± √(3² − 4·2·(−7))] / (2·2) = (−3 ± √(9 + 56)) / 4 = (−3 ± √65) / 4"
+  },
+  {
+    eq: "x² + 6x − 5 = 0",
+    best: "Completing the square", ok: ["Quadratic formula"],
+    tip: "The formula works, but with a = 1 and an even b, completing the square is faster.",
+    why: "a = 1 and b = 6 is even, but no factors of −5 add to 6. Complete the square.",
+    answer: "x = −3 ± √14",
+    distractors: ["x = 3 ± √14", "x = −3 ± √4", "x = −3 ± 14"],
+    work: "x² + 6x = 5 → x² + 6x + 9 = 5 + 9 → (x + 3)² = 14 → x = −3 ± √14"
+  },
+  {
+    eq: "x² − 9x = 0",
+    best: "Factoring", ok: [],
+    why: "There is no constant term, so factor out the GCF, x.",
+    answer: "x = 0, 9",
+    distractors: ["x = 9", "x = ±3", "x = 0, −9"],
+    work: "x(x − 9) = 0 → x = 0 or x = 9"
+  },
+  {
+    eq: "3x² − 75 = 0",
+    best: "Square roots", ok: ["Factoring"],
+    tip: "Factoring 3(x − 5)(x + 5) works too, but isolating x² is quicker.",
+    why: "No x-term. Isolate x² and take the square root.",
+    answer: "x = ±5",
+    distractors: ["x = 5", "x = ±25", "x = ±√72"],
+    work: "3x² = 75 → x² = 25 → x = ±5"
+  },
+  {
+    eq: "x² − 10x + 18 = 0",
+    best: "Completing the square", ok: ["Quadratic formula"],
+    tip: "The formula works, but with a = 1 and an even b, completing the square is faster.",
+    why: "a = 1 and b = −10 is even, but no factors of 18 add to −10. Complete the square.",
+    answer: "x = 5 ± √7",
+    distractors: ["x = −5 ± √7", "x = 5 ± √43", "x = 5 ± 7"],
+    work: "x² − 10x = −18 → x² − 10x + 25 = −18 + 25 → (x − 5)² = 7 → x = 5 ± √7"
+  },
+  {
+    eq: "2x² + x − 3 = 0",
+    best: "Factoring", ok: ["Quadratic formula"],
+    tip: "The formula works, but the discriminant is 25 (a perfect square), so it factors.",
+    why: "The discriminant 1 + 24 = 25 is a perfect square, so it factors: (2x + 3)(x − 1).",
+    answer: "x = 1, −3/2",
+    distractors: ["x = −1, 3/2", "x = 1, −3", "x = 3, −1/2"],
+    work: "(2x + 3)(x − 1) = 0 → x = −3/2 or x = 1"
+  },
+  {
+    eq: "5x² − 2x − 1 = 0",
+    best: "Quadratic formula", ok: [],
+    why: "a ≠ 1 and the discriminant (24) is not a perfect square. Use the formula.",
+    answer: "x = (1 ± √6) / 5",
+    distractors: ["x = (−1 ± √6) / 5", "x = (1 ± √24) / 5", "x = (2 ± √6) / 10"],
+    work: "x = [2 ± √(4 + 20)] / 10 = (2 ± 2√6) / 10 = (1 ± √6) / 5"
+  },
+  {
+    eq: "4x² − 12x + 9 = 0",
+    best: "Factoring", ok: [],
+    why: "It is a perfect square trinomial: (2x)² − 2(2x)(3) + 3² = (2x − 3)².",
+    answer: "x = 3/2",
+    distractors: ["x = −3/2", "x = ±3/2", "x = 3"],
+    work: "(2x − 3)² = 0 → 2x − 3 = 0 → x = 3/2 (a double root)"
+  },
+  {
+    eq: "x² + 4x + 13 = 0",
+    best: "Completing the square", ok: ["Quadratic formula"],
+    tip: "The formula works, but with a = 1 and an even b, completing the square is faster.",
+    why: "a = 1 and b = 4 is even, and it doesn't factor. Complete the square (expect complex roots!).",
+    answer: "x = −2 ± 3i",
+    distractors: ["x = 2 ± 3i", "x = −2 ± 3", "x = −2 ± 9i"],
+    work: "x² + 4x = −13 → x² + 4x + 4 = −13 + 4 → (x + 2)² = −9 → x + 2 = ±3i → x = −2 ± 3i"
+  }
+];
+
+const $ = id => document.getElementById(id);
+let order, idx, results;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS);
+  idx = 0;
+  results = [];
+  $("intro").classList.add("hidden");
+  $("results").classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  render();
+}
+
+function points() {
+  return results.reduce((s, r) => s + r.method + r.sol, 0);
+}
+
+function render() {
+  const q = order[idx];
+  results[idx] = { q, method: 0, sol: 0, methodPick: null, solPick: null };
+  $("qnum").textContent = `Question ${idx + 1} of ${order.length}`;
+  $("running").textContent = `Score: ${points()} / ${idx * 2}`;
+  $("barfill").style.width = `${(idx / order.length) * 100}%`;
+  $("eq").textContent = q.eq;
+  $("methodFb").innerHTML = "";
+  $("solFb").innerHTML = "";
+  $("work").classList.add("hidden");
+  $("solveBlock").classList.add("hidden");
+  $("next").disabled = true;
+  $("next").textContent = idx === order.length - 1 ? "See results" : "Next";
+
+  const mo = $("methodOpts");
+  mo.innerHTML = "";
+  METHODS.forEach(m => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = m;
+    b.onclick = () => pickMethod(m);
+    mo.appendChild(b);
+  });
+
+  const so = $("solOpts");
+  so.innerHTML = "";
+  shuffle([q.answer, ...q.distractors]).forEach(s => {
+    const b = document.createElement("button");
+    b.className = "opt math";
+    b.textContent = s;
+    b.onclick = () => pickSol(s);
+    so.appendChild(b);
+  });
+}
+
+function pickMethod(m) {
+  const q = order[idx], r = results[idx];
+  r.methodPick = m;
+  let cls, html;
+  if (m === q.best) {
+    r.method = 1; cls = "good";
+    html = `<strong>Yes!</strong> ${q.why}`;
+  } else if (q.ok.includes(m)) {
+    r.method = 1; cls = "ok";
+    html = `<strong>That works.</strong> ${q.tip}`;
+  } else {
+    cls = "bad";
+    html = `<strong>Not the best choice.</strong> Best method: <strong>${q.best}</strong>. ${q.why}`;
+  }
+  [...$("methodOpts").children].forEach(b => {
+    b.disabled = true;
+    if (b.textContent === m) b.classList.add("sel-" + cls);
+    else if (b.textContent === q.best) b.classList.add("reveal");
+  });
+  $("methodFb").innerHTML = `<div class="fb ${cls}">${html}</div>`;
+  $("solveBlock").classList.remove("hidden");
+}
+
+function pickSol(s) {
+  const q = order[idx], r = results[idx];
+  r.solPick = s;
+  const right = s === q.answer;
+  r.sol = right ? 1 : 0;
+  [...$("solOpts").children].forEach(b => {
+    b.disabled = true;
+    if (b.textContent === s) b.classList.add(right ? "sel-good" : "sel-bad");
+    else if (b.textContent === q.answer) b.classList.add("reveal");
+  });
+  $("solFb").innerHTML = right
+    ? `<div class="fb good"><strong>Correct!</strong></div>`
+    : `<div class="fb bad"><strong>Not quite.</strong> The answer is <span class="math">${q.answer}</span>.</div>`;
+  $("work").innerHTML = `Work: <span class="math">${q.work}</span>`;
+  $("work").classList.remove("hidden");
+  $("running").textContent = `Score: ${points()} / ${(idx + 1) * 2}`;
+  $("next").disabled = false;
+}
+
+function next() {
+  idx++;
+  if (idx < order.length) render();
+  else finish();
+}
+
+function mark(n, full) {
+  return n ? `<span class="${full ? "tick" : "half"}">✓</span>` : `<span class="cross">✗</span>`;
+}
+
+function finish() {
+  $("quiz").classList.add("hidden");
+  $("results").classList.remove("hidden");
+  const total = order.length * 2, pts = points();
+  const pct = Math.round((pts / total) * 100);
+  $("final").textContent = `${pts} / ${total} (${pct}%)`;
+  $("finalMsg").textContent =
+    pct >= 90 ? "Excellent — you know when to use each method!" :
+    pct >= 75 ? "Nice work. Review the ones you missed below." :
+    pct >= 50 ? "Getting there. Look over the method guide and try again." :
+                "Review the four methods and when to use each, then try again.";
+  $("summary").innerHTML = results.map((r, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td class="math">${r.q.eq}</td>
+      <td>${mark(r.method, r.methodPick === r.q.best)} ${r.methodPick}${r.methodPick !== r.q.best ? `<br><small>Best: ${r.q.best}</small>` : ""}</td>
+      <td>${mark(r.sol, true)} <span class="math">${r.solPick}</span>${r.sol ? "" : `<br><small>Answer: <span class="math">${r.q.answer}</span></small>`}</td>
+    </tr>`).join("");
+}
+
+$("qcount").textContent = QUESTIONS.length;
+$("start").onclick = start;
+$("next").onclick = next;
+$("retry").onclick = start;
+</script>
+</body>
+</html>
