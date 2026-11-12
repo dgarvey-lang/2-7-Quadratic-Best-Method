@@ -4,8 +4,7 @@ An interactive, self-checking quiz (`index.html`) on picking the most efficient 
 
 - **Square roots**: no x-term (`ax² = c` or `(x − h)² = k`)
 - **Factoring**: the trinomial factors nicely, or there's no constant term (GCF)
-- **Completing the square**: `a = 1` and `b` is even, but it doesn't factor
-- **Quadratic formula**: works every time; best when `a ≠ 1` and it doesn't factor
+- **Quadratic formula**: works every time; best when it doesn't factor
 
 There are 12 questions, shown in random order. Each one has two steps:
 

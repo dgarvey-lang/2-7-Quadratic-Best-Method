@@ -122,8 +122,7 @@
     <div class="methods">
       <div><b>Square roots</b>No x-term: ax² = c or (x − h)² = k</div>
       <div><b>Factoring</b>Trinomial factors nicely, or there is no constant (GCF)</div>
-      <div><b>Completing the square</b>a = 1 and b is even, but it doesn't factor</div>
-      <div><b>Quadratic formula</b>Works for everything; best when a ≠ 1 and it doesn't factor</div>
+      <div><b>Quadratic formula</b>Works for everything; best when it doesn't factor</div>
     </div>
     <p>There are <strong id="qcount"></strong> questions, each worth 2 points (1 for the method, 1 for the solution).</p>
     <div class="nav"><button class="btn" id="start">Start quiz</button></div>
@@ -162,7 +161,7 @@
 </main>
 
 <script>
-const METHODS = ["Square roots", "Factoring", "Completing the square", "Quadratic formula"];
+const METHODS = ["Square roots", "Factoring", "Quadratic formula"];
 
 // best: the most efficient method. ok: methods that also work well (full credit, with a tip).
 const QUESTIONS = [
@@ -200,12 +199,11 @@ const QUESTIONS = [
   },
   {
     eq: "x² + 6x − 5 = 0",
-    best: "Completing the square", ok: ["Quadratic formula"],
-    tip: "The formula works, but with a = 1 and an even b, completing the square is faster.",
-    why: "a = 1 and b = 6 is even, but no factors of −5 add to 6. Complete the square.",
+    best: "Quadratic formula", ok: [],
+    why: "No factors of −5 add to 6, so it won't factor. Use the formula.",
     answer: "x = −3 ± √14",
-    distractors: ["x = 3 ± √14", "x = −3 ± √4", "x = −3 ± 14"],
-    work: "x² + 6x = 5 → x² + 6x + 9 = 5 + 9 → (x + 3)² = 14 → x = −3 ± √14"
+    distractors: ["x = 3 ± √14", "x = −6 ± √14", "x = −3 ± 14"],
+    work: "x = [−6 ± √(6² − 4·1·(−5))] / 2 = (−6 ± √56) / 2 = (−6 ± 2√14) / 2 = −3 ± √14"
   },
   {
     eq: "x² − 9x = 0",
@@ -226,12 +224,11 @@ const QUESTIONS = [
   },
   {
     eq: "x² − 10x + 18 = 0",
-    best: "Completing the square", ok: ["Quadratic formula"],
-    tip: "The formula works, but with a = 1 and an even b, completing the square is faster.",
-    why: "a = 1 and b = −10 is even, but no factors of 18 add to −10. Complete the square.",
+    best: "Quadratic formula", ok: [],
+    why: "No factors of 18 add to −10, so it won't factor. Use the formula.",
     answer: "x = 5 ± √7",
-    distractors: ["x = −5 ± √7", "x = 5 ± √43", "x = 5 ± 7"],
-    work: "x² − 10x = −18 → x² − 10x + 25 = −18 + 25 → (x − 5)² = 7 → x = 5 ± √7"
+    distractors: ["x = −5 ± √7", "x = 10 ± √7", "x = 5 ± 7"],
+    work: "x = [10 ± √((−10)² − 4·1·18)] / 2 = (10 ± √28) / 2 = (10 ± 2√7) / 2 = 5 ± √7"
   },
   {
     eq: "2x² + x − 3 = 0",
@@ -260,12 +257,11 @@ const QUESTIONS = [
   },
   {
     eq: "x² + 4x + 13 = 0",
-    best: "Completing the square", ok: ["Quadratic formula"],
-    tip: "The formula works, but with a = 1 and an even b, completing the square is faster.",
-    why: "a = 1 and b = 4 is even, and it doesn't factor. Complete the square (expect complex roots!).",
+    best: "Quadratic formula", ok: [],
+    why: "The discriminant 16 − 52 = −36 is negative, so it won't factor. Use the formula (expect complex roots!).",
     answer: "x = −2 ± 3i",
-    distractors: ["x = 2 ± 3i", "x = −2 ± 3", "x = −2 ± 9i"],
-    work: "x² + 4x = −13 → x² + 4x + 4 = −13 + 4 → (x + 2)² = −9 → x + 2 = ±3i → x = −2 ± 3i"
+    distractors: ["x = 2 ± 3i", "x = −2 ± 3", "x = −2 ± 6i"],
+    work: "x = [−4 ± √(4² − 4·1·13)] / 2 = (−4 ± √−36) / 2 = (−4 ± 6i) / 2 = −2 ± 3i"
   }
 ];
 
