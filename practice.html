@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Best Method Practice</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>2-7 Practice: Choosing the Best Method</h1>
+  <p class="sub">For each quadratic equation, choose the most efficient method for solving it.</p>
+
+  <section id="intro" class="card">
+    <p style="margin-top:0"><strong>The four methods</strong></p>
+    <div class="methods">
+      <div><b>Square roots</b>No x-term: ax² = c or (x − h)² = k</div>
+      <div><b>Factoring</b>Trinomial factors nicely, or there is no constant (GCF)</div>
+      <div><b>Quadratic formula</b>Works for everything; best when it doesn't factor</div>
+    </div>
+    <p>There are <strong id="qcount"></strong> questions, each worth 1 point.</p>
+    <div class="nav"><button class="btn" id="start">Start quiz</button></div>
+  </section>
+
+  <section id="quiz" class="hidden">
+    <div class="progress"><span id="qnum"></span><span id="running"></span></div>
+    <div class="bar"><span id="barfill"></span></div>
+    <div class="card">
+      <div class="eq" id="eq"></div>
+      <div class="step">Which method is best?</div>
+      <div class="opts two" id="methodOpts"></div>
+      <div id="methodFb"></div>
+      <div class="nav"><button class="btn" id="next" disabled>Next</button></div>
+    </div>
+  </section>
+
+  <section id="results" class="hidden">
+    <div class="card">
+      <p style="margin:0;text-align:center;color:var(--muted)">Your score</p>
+      <div class="score" id="final"></div>
+      <p style="text-align:center;margin-top:0" id="finalMsg"></p>
+      <table>
+        <thead><tr><th>#</th><th>Equation</th><th>Your method</th></tr></thead>
+        <tbody id="summary"></tbody>
+      </table>
+      <div class="nav"><button class="btn secondary" id="retry">Try again</button></div>
+    </div>
+  </section>
+</main>
+
+<script src="questions.js"></script>
+<script>
+
+const $ = id => document.getElementById(id);
+let order, idx, results;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS);
+  idx = 0;
+  results = [];
+  $("intro").classList.add("hidden");
+  $("results").classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  render();
+}
+
+function points() {
+  return results.reduce((s, r) => s + r.method, 0);
+}
+
+function render() {
+  const q = order[idx];
+  results[idx] = { q, method: 0, methodPick: null };
+  $("qnum").textContent = `Question ${idx + 1} of ${order.length}`;
+  $("running").textContent = `Score: ${points()} / ${idx}`;
+  $("barfill").style.width = `${(idx / order.length) * 100}%`;
+  $("eq").textContent = q.eq;
+  $("methodFb").innerHTML = "";
+  $("next").disabled = true;
+  $("next").textContent = idx === order.length - 1 ? "See results" : "Next";
+
+  const mo = $("methodOpts");
+  mo.innerHTML = "";
+  METHODS.forEach(m => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = m;
+    b.onclick = () => pickMethod(m);
+    mo.appendChild(b);
+  });
+}
+
+function pickMethod(m) {
+  const q = order[idx], r = results[idx];
+  r.methodPick = m;
+  let cls, html;
+  if (m === q.best) {
+    r.method = 1; cls = "good";
+    html = `<strong>Yes!</strong> ${q.why}`;
+  } else if (q.ok.includes(m)) {
+    r.method = 1; cls = "ok";
+    html = `<strong>That works.</strong> ${q.tip}`;
+  } else {
+    cls = "bad";
+    html = `<strong>Not the best choice.</strong> Best method: <strong>${q.best}</strong>. ${q.why}`;
+  }
+  [...$("methodOpts").children].forEach(b => {
+    b.disabled = true;
+    if (b.textContent === m) b.classList.add("sel-" + cls);
+    else if (b.textContent === q.best) b.classList.add("reveal");
+  });
+  $("methodFb").innerHTML = `<div class="fb ${cls}">${html}</div>`;
+  $("running").textContent = `Score: ${points()} / ${idx + 1}`;
+  $("next").disabled = false;
+}
+
+
+function next() {
+  idx++;
+  if (idx < order.length) render();
+  else finish();
+}
+
+function mark(n, full) {
+  return n ? `<span class="${full ? "tick" : "half"}">✓</span>` : `<span class="cross">✗</span>`;
+}
+
+function finish() {
+  $("quiz").classList.add("hidden");
+  $("results").classList.remove("hidden");
+  const total = order.length, pts = points();
+  const pct = Math.round((pts / total) * 100);
+  $("final").textContent = `${pts} / ${total} (${pct}%)`;
+  $("finalMsg").textContent =
+    pct >= 90 ? "Excellent — you know when to use each method!" :
+    pct >= 75 ? "Nice work. Review the ones you missed below." :
+    pct >= 50 ? "Getting there. Look over the method guide and try again." :
+                "Review the three methods and when to use each, then try again.";
+  $("summary").innerHTML = results.map((r, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td class="math">${r.q.eq}</td>
+      <td>${mark(r.method, r.methodPick === r.q.best)} ${r.methodPick}${r.methodPick !== r.q.best ? `<br><small>Best: ${r.q.best}</small>` : ""}</td>
+    </tr>`).join("");
+}
+
+$("qcount").textContent = QUESTIONS.length;
+$("start").onclick = start;
+$("next").onclick = next;
+$("retry").onclick = start;
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Best Method Teacher View</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="projector">
+<main>
+  <div class="bar-top">
+    <h1 style="margin:0">2-7 Live Quiz: Choosing the Best Method</h1>
+    <span class="muted" id="status"></span>
+  </div>
+
+  <section id="v-setup" class="card hidden">
+    <p style="margin-top:0"><strong>The live quiz isn't connected yet.</strong></p>
+    <p class="muted">Follow the steps in SETUP.md to create the Google Sheet backend, then paste its
+      Web app URL into <code>config.js</code>.</p>
+  </section>
+
+  <section id="v-pin" class="card hidden">
+    <label for="pin"><strong>Teacher PIN</strong></label>
+    <div class="row" style="margin-top:8px">
+      <input type="password" id="pin" autocomplete="off">
+      <button class="btn" id="pinBtn">Continue</button>
+    </div>
+    <p id="pinErr" class="err"></p>
+  </section>
+
+  <section id="v-off" class="card center hidden">
+    <p style="font-size:1.2rem;margin-top:0">Ready when you are.</p>
+    <button class="btn" id="startBtn">Start a new session</button>
+  </section>
+
+  <section id="v-lobby" class="hidden">
+    <div class="card center">
+      <p style="margin-top:0">Students, go to:</p>
+      <div class="link-box" id="studentLink"></div>
+      <p class="big-num" id="joinCount" style="margin-bottom:0">0</p>
+      <p class="muted" style="margin-top:0">students joined</p>
+      <div id="names"></div>
+      <div class="nav" style="justify-content:center"><button class="btn" id="firstBtn">Show question 1</button></div>
+    </div>
+  </section>
+
+  <section id="v-question" class="hidden">
+    <div class="progress"><span id="qnum"></span><span id="qcount"></span></div>
+    <div class="card">
+      <div class="eq" id="eq"></div>
+      <div class="step center">Which method is best?</div>
+      <div class="choices" id="choices"></div>
+      <p class="center" style="margin:22px 0 0"><span class="big-num" id="answered">0</span>
+        <span class="muted" id="answeredOf"></span></p>
+      <div class="nav"><button class="btn" id="revealBtn">Reveal results</button></div>
+    </div>
+  </section>
+
+  <section id="v-reveal" class="hidden">
+    <div class="progress"><span id="rqnum"></span><span></span></div>
+    <div class="card">
+      <div class="eq" id="req"></div>
+      <div id="split"></div>
+      <div class="step" style="margin-top:20px">What students picked</div>
+      <div id="byMethod"></div>
+      <div id="why"></div>
+      <div class="nav"><button class="btn" id="nextBtn">Next question</button></div>
+    </div>
+  </section>
+
+  <section id="v-done" class="hidden">
+    <div class="card">
+      <p class="center" style="font-size:1.3rem;margin-top:0"><strong>Quiz complete</strong></p>
+      <div class="step">Each question</div>
+      <div id="perQuestion"></div>
+      <div class="step" style="margin-top:20px">Each student</div>
+      <table>
+        <thead><tr><th>Name</th><th>Score</th></tr></thead>
+        <tbody id="perStudent"></tbody>
+      </table>
+      <p class="muted">Every answer is also saved in the Responses tab of your Google Sheet.</p>
+      <div class="nav"><button class="btn" id="restartBtn">Start a new session</button></div>
+    </div>
+  </section>
+
+  <p class="center" style="margin-top:24px">
+    <button class="btn secondary hidden" id="endBtn">End quiz</button>
+  </p>
+  <p id="netErr" class="err center"></p>
+</main>
+
+<script src="config.js"></script>
+<script src="questions.js"></script>
+<script src="live-api.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const VIEWS = ["v-setup", "v-pin", "v-off", "v-lobby", "v-question", "v-reveal", "v-done"];
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+};
+const TOTAL = QUESTIONS.length;
+
+let pin = store.get("bm_pin") || "";
+let data = null;          // last { state, players, stats } from the backend
+let lastView = "";
+let busy = false;
+
+function show(view) {
+  VIEWS.forEach(v => $(v).classList.toggle("hidden", v !== view));
+  const live = ["v-lobby", "v-question", "v-reveal"].includes(view);
+  $("endBtn").classList.toggle("hidden", !live);
+}
+
+async function teacher(action, extra = {}) {
+  const r = await api.post({ action, pin, ...extra });
+  if (r.error === "Wrong PIN") {
+    pin = "";
+    store.set("bm_pin", "");
+    show("v-pin");
+    $("pinErr").textContent = "That PIN didn't work.";
+    throw new Error("pin");
+  }
+  if (r.error) throw new Error(r.error);
+  return r;
+}
+
+async function poll() {
+  if (busy || !pin) return;
+  busy = true;
+  try {
+    data = await teacher("stats");
+    $("netErr").textContent = "";
+    await render();
+  } catch (e) {
+    if (e.message !== "pin") $("netErr").textContent = "Having trouble connecting… retrying.";
+  } finally {
+    busy = false;
+  }
+}
+
+// Run a control button's action, then refresh right away.
+async function act(action, extra) {
+  if (busy) return;
+  busy = true;
+  document.querySelectorAll("button").forEach(b => (b.disabled = true));
+  try {
+    await teacher(action, extra);
+    data = await teacher("stats");
+    await render();
+  } catch (e) {
+    if (e.message !== "pin") $("netErr").textContent = "That didn't go through. Try again.";
+  } finally {
+    document.querySelectorAll("button").forEach(b => (b.disabled = false));
+    busy = false;
+  }
+}
+
+async function render() {
+  const { state, players, stats } = data;
+  const q = QUESTIONS[state.q];
+  const view = state.phase === "off" ? "v-off" : "v-" + state.phase;
+  const viewKey = `${state.session}|${state.phase}|${state.q}`;
+  const changed = viewKey !== lastView;
+  lastView = viewKey;
+  show(view);
+  $("status").textContent = state.session ? `${players.length} joined` : "";
+
+  if (state.phase === "lobby") {
+    $("studentLink").textContent = new URL("./", location.href).href;
+    $("joinCount").textContent = players.length;
+    $("names").innerHTML = players.map(n => `<span class="pill">${escapeHtml(n)}</span>`).join("");
+  }
+
+  if (state.phase === "question") {
+    if (changed) {
+      $("qnum").textContent = `Question ${state.q + 1} of ${TOTAL}`;
+      $("eq").textContent = q.eq;
+      $("choices").innerHTML = METHODS.map(m => `<span>${m}</span>`).join("");
+    }
+    const n = stats ? stats.answered : 0;
+    $("answered").textContent = n;
+    $("answeredOf").textContent = `of ${players.length} answered`;
+  }
+
+  if (state.phase === "reveal" && changed) {
+    const s = state.stats || { answered: 0, correct: 0, byMethod: {} };
+    $("rqnum").textContent = `Question ${state.q + 1} of ${TOTAL}`;
+    $("req").textContent = q.eq;
+    $("split").innerHTML = splitBar(s);
+    $("byMethod").innerHTML = METHODS.map(m => {
+      const c = s.byMethod[m] || 0;
+      const pct = s.answered ? Math.round((c / s.answered) * 100) : 0;
+      const cls = m === q.best ? "good" : q.ok.includes(m) ? "ok" : "";
+      const tag = m === q.best ? " ✓ best" : q.ok.includes(m) ? " (also works)" : "";
+      return `<div class="mbar"><span>${m}<strong>${tag}</strong></span>
+        <div class="track"><div class="fill ${cls}" style="width:${pct}%"></div></div><span>${c}</span></div>`;
+    }).join("");
+    $("why").innerHTML = `<div class="fb good" style="margin-top:14px"><strong>Best: ${q.best}.</strong> ${q.why}` +
+      (q.tip ? ` <em>${q.tip}</em>` : "") + `</div>`;
+    $("nextBtn").textContent = state.q + 1 >= TOTAL ? "Finish quiz" : "Next question";
+  }
+
+  if (state.phase === "done" && changed) {
+    const sum = await teacher("summary");
+    $("perQuestion").innerHTML = QUESTIONS.slice(0, state.q + 1).map((qq, i) => {
+      const pq = sum.perQuestion[i] || { answered: 0, correct: 0 };
+      const pct = pq.answered ? Math.round((pq.correct / pq.answered) * 100) : 0;
+      return `<div class="mbar"><span class="math">${i + 1}. ${qq.eq}</span>
+        <div class="track"><div class="fill good" style="width:${pct}%"></div></div><span>${pq.answered ? pct + "%" : "—"}</span></div>`;
+    }).join("");
+    $("perStudent").innerHTML = sum.students.map(st =>
+      `<tr><td>${escapeHtml(st.name)}</td><td>${st.correct} / ${state.q + 1}</td></tr>`).join("") ||
+      `<tr><td colspan="2" class="muted">No answers recorded.</td></tr>`;
+  }
+}
+
+function splitBar(s) {
+  if (!s.answered) return `<p class="muted center">Nobody answered this one.</p>`;
+  const right = Math.round((s.correct / s.answered) * 100), wrong = 100 - right;
+  return `
+    <div class="legend" style="font-size:1.4rem"><span class="g">${right}% right</span><span class="b">${wrong}% wrong</span></div>
+    <div class="split"><div class="g" style="width:${right}%">${right ? s.correct : ""}</div><div class="b" style="width:${wrong}%">${wrong ? s.answered - s.correct : ""}</div></div>
+    <p class="muted center" style="margin:0">${s.answered} answered</p>`;
+}
+
+function startSession() {
+  if (data && ["lobby", "question", "reveal"].includes(data.state.phase) &&
+      !confirm("A quiz is in progress. Start over with a new session?")) return;
+  act("start", { total: TOTAL });
+}
+
+$("pinBtn").onclick = () => {
+  pin = $("pin").value.trim();
+  store.set("bm_pin", pin);
+  $("pinErr").textContent = "";
+  poll();
+};
+$("pin").addEventListener("keydown", e => { if (e.key === "Enter") $("pinBtn").click(); });
+$("startBtn").onclick = startSession;
+$("restartBtn").onclick = startSession;
+$("firstBtn").onclick = () => act("show", { q: 0 });
+$("revealBtn").onclick = () => act("reveal");
+$("nextBtn").onclick = () => {
+  const q = data.state.q;
+  if (q + 1 >= TOTAL) act("end");
+  else act("show", { q: q + 1 });
+};
+$("endBtn").onclick = () => { if (confirm("End the quiz now and show the summary?")) act("end"); };
+
+if (!api.configured()) {
+  show("v-setup");
+} else if (!pin) {
+  show("v-pin");
+} else {
+  poll();
+}
+setInterval(() => { if (api.configured()) poll(); }, 2000);
+</script>
+</body>
+</html>

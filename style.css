@@ -1,0 +1,141 @@
+  :root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --text: #1d2433;
+    --muted: #5b6475;
+    --border: #d9dde7;
+    --accent: #2f5bd3;
+    --accent-soft: #e6ecfb;
+    --good: #1f8a4c;
+    --good-soft: #e3f4ea;
+    --warn: #a86500;
+    --warn-soft: #fbf0dc;
+    --bad: #c23b3b;
+    --bad-soft: #f9e3e3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c;
+      --card: #1b2029;
+      --text: #e7eaf0;
+      --muted: #9aa3b5;
+      --border: #2e3542;
+      --accent: #7a9bff;
+      --accent-soft: #232c45;
+      --good: #4cc483;
+      --good-soft: #17301f;
+      --warn: #e6a640;
+      --warn-soft: #33270f;
+      --bad: #ef7171;
+      --bad-soft: #3a1c1c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .methods div { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; font-size: 0.92rem; }
+  .methods b { display: block; }
+  .progress { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; margin-bottom: 8px; }
+  .bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
+  .bar span { display: block; height: 100%; background: var(--accent); transition: width .25s; }
+  .eq {
+    font: 600 1.6rem/1.3 "Cambria Math", "STIX Two Math", Georgia, serif;
+    text-align: center;
+    padding: 14px 0 18px;
+  }
+  .step { font-weight: 600; margin: 14px 0 8px; }
+  .opts { display: grid; gap: 8px; }
+  .opts.two { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 480px) { .opts.two { grid-template-columns: 1fr; } }
+  button.opt {
+    text-align: left;
+    font: inherit;
+    color: var(--text);
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+  }
+  button.opt:hover:not(:disabled) { border-color: var(--accent); }
+  button.opt:disabled { cursor: default; }
+  button.opt.sel-good { border-color: var(--good); background: var(--good-soft); }
+  button.opt.sel-ok { border-color: var(--warn); background: var(--warn-soft); }
+  button.opt.sel-bad { border-color: var(--bad); background: var(--bad-soft); }
+  button.opt.reveal { border-color: var(--good); border-style: dashed; }
+  .math { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 1.1rem; }
+  .fb { border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 0.95rem; }
+  .fb.good { background: var(--good-soft); }
+  .fb.ok { background: var(--warn-soft); }
+  .fb.bad { background: var(--bad-soft); }
+  .nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+  .btn {
+    font: inherit; font-weight: 600;
+    border: 0; border-radius: 8px;
+    padding: 10px 20px;
+    background: var(--accent); color: #fff;
+    cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) { .btn { color: #0f1320; } }
+  .btn.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .hidden { display: none; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .score { font-size: 2.4rem; font-weight: 700; text-align: center; margin: 6px 0; }
+  .tick { color: var(--good); font-weight: 700; }
+  .half { color: var(--warn); font-weight: 700; }
+  .cross { color: var(--bad); font-weight: 700; }
+
+  /* ----- Live quiz (index.html and teacher.html) ----- */
+  input[type=text], input[type=password] {
+    font: inherit; color: var(--text); background: var(--card);
+    border: 2px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; width: 100%;
+  }
+  input:focus { outline: none; border-color: var(--accent); }
+  .row { display: flex; gap: 10px; }
+  .row input { flex: 1; }
+  .center { text-align: center; }
+  .muted { color: var(--muted); }
+  .err { color: var(--bad); }
+  .pill { display: inline-block; background: var(--accent-soft); border-radius: 999px; padding: 3px 12px; margin: 3px; font-size: 0.9rem; }
+  .big-num { font-size: 3rem; font-weight: 700; line-height: 1.1; }
+  .split { display: flex; height: 64px; border-radius: 10px; overflow: hidden; margin: 12px 0 6px; background: var(--border); }
+  .split div { display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.3rem; min-width: 0; white-space: nowrap; transition: width .4s; }
+  .split .g { background: var(--good); }
+  .split .b { background: var(--bad); }
+  @media (prefers-color-scheme: dark) { .split div { color: #0f1320; } }
+  .legend { display: flex; justify-content: space-between; font-weight: 600; }
+  .legend .g { color: var(--good); }
+  .legend .b { color: var(--bad); }
+  .mbar { display: grid; grid-template-columns: 170px 1fr 48px; gap: 10px; align-items: center; margin: 6px 0; font-size: 0.95rem; }
+  .mbar .track { height: 22px; background: var(--border); border-radius: 6px; overflow: hidden; }
+  .mbar .fill { height: 100%; background: var(--muted); }
+  .mbar .fill.good { background: var(--good); }
+  .mbar .fill.ok { background: var(--warn); }
+  @media (max-width: 480px) { .mbar { grid-template-columns: 110px 1fr 40px; } }
+  .choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .choices span { border: 2px solid var(--border); border-radius: 8px; padding: 8px 16px; }
+
+  /* Projector view: bigger type. */
+  body.projector main { max-width: 1000px; }
+  body.projector .eq { font-size: 3rem; padding: 20px 0 28px; }
+  body.projector .choices span { font-size: 1.3rem; }
+  .bar-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+  .link-box { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.15rem; word-break: break-all; background: var(--accent-soft); padding: 10px 14px; border-radius: 8px; }

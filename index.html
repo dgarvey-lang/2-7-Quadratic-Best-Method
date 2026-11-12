@@ -3,330 +3,265 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quadratic Best Method Quiz</title>
-<style>
-  :root {
-    --bg: #f6f7fb;
-    --card: #ffffff;
-    --text: #1d2433;
-    --muted: #5b6475;
-    --border: #d9dde7;
-    --accent: #2f5bd3;
-    --accent-soft: #e6ecfb;
-    --good: #1f8a4c;
-    --good-soft: #e3f4ea;
-    --warn: #a86500;
-    --warn-soft: #fbf0dc;
-    --bad: #c23b3b;
-    --bad-soft: #f9e3e3;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #12151c;
-      --card: #1b2029;
-      --text: #e7eaf0;
-      --muted: #9aa3b5;
-      --border: #2e3542;
-      --accent: #7a9bff;
-      --accent-soft: #232c45;
-      --good: #4cc483;
-      --good-soft: #17301f;
-      --warn: #e6a640;
-      --warn-soft: #33270f;
-      --bad: #ef7171;
-      --bad-soft: #3a1c1c;
-    }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
-  h1 { font-size: 1.7rem; margin: 0 0 4px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-  .methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
-  .methods div { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; font-size: 0.92rem; }
-  .methods b { display: block; }
-  .progress { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; margin-bottom: 8px; }
-  .bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
-  .bar span { display: block; height: 100%; background: var(--accent); transition: width .25s; }
-  .eq {
-    font: 600 1.6rem/1.3 "Cambria Math", "STIX Two Math", Georgia, serif;
-    text-align: center;
-    padding: 14px 0 18px;
-  }
-  .step { font-weight: 600; margin: 14px 0 8px; }
-  .opts { display: grid; gap: 8px; }
-  .opts.two { grid-template-columns: 1fr 1fr; }
-  @media (max-width: 480px) { .opts.two { grid-template-columns: 1fr; } }
-  button.opt {
-    text-align: left;
-    font: inherit;
-    color: var(--text);
-    background: var(--card);
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    cursor: pointer;
-  }
-  button.opt:hover:not(:disabled) { border-color: var(--accent); }
-  button.opt:disabled { cursor: default; }
-  button.opt.sel-good { border-color: var(--good); background: var(--good-soft); }
-  button.opt.sel-ok { border-color: var(--warn); background: var(--warn-soft); }
-  button.opt.sel-bad { border-color: var(--bad); background: var(--bad-soft); }
-  button.opt.reveal { border-color: var(--good); border-style: dashed; }
-  .math { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 1.1rem; }
-  .fb { border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 0.95rem; }
-  .fb.good { background: var(--good-soft); }
-  .fb.ok { background: var(--warn-soft); }
-  .fb.bad { background: var(--bad-soft); }
-  .nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
-  .btn {
-    font: inherit; font-weight: 600;
-    border: 0; border-radius: 8px;
-    padding: 10px 20px;
-    background: var(--accent); color: #fff;
-    cursor: pointer;
-  }
-  @media (prefers-color-scheme: dark) { .btn { color: #0f1320; } }
-  .btn.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
-  .btn:disabled { opacity: .4; cursor: default; }
-  .hidden { display: none; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  .score { font-size: 2.4rem; font-weight: 700; text-align: center; margin: 6px 0; }
-  .tick { color: var(--good); font-weight: 700; }
-  .half { color: var(--warn); font-weight: 700; }
-  .cross { color: var(--bad); font-weight: 700; }
-</style>
+<title>Best Method Live Quiz</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main>
-  <h1>2-7 Quiz: Choosing the Best Method</h1>
-  <p class="sub">For each quadratic equation, choose the most efficient method for solving it.</p>
+  <h1>2-7 Live Quiz: Choosing the Best Method</h1>
+  <p class="sub">Your teacher controls the questions. Keep this page open.</p>
 
-  <section id="intro" class="card">
-    <p style="margin-top:0"><strong>The four methods</strong></p>
-    <div class="methods">
-      <div><b>Square roots</b>No x-term: ax² = c or (x − h)² = k</div>
-      <div><b>Factoring</b>Trinomial factors nicely, or there is no constant (GCF)</div>
-      <div><b>Quadratic formula</b>Works for everything; best when it doesn't factor</div>
-    </div>
-    <p>There are <strong id="qcount"></strong> questions, each worth 1 point.</p>
-    <div class="nav"><button class="btn" id="start">Start quiz</button></div>
+  <!-- Backend not set up yet -->
+  <section id="v-setup" class="card hidden">
+    <p style="margin-top:0"><strong>The live quiz isn't set up yet.</strong></p>
+    <p class="muted">Your teacher needs to finish the steps in SETUP.md. You can still use the
+      <a href="practice.html">self-paced practice quiz</a>.</p>
   </section>
 
-  <section id="quiz" class="hidden">
-    <div class="progress"><span id="qnum"></span><span id="running"></span></div>
-    <div class="bar"><span id="barfill"></span></div>
+  <!-- Enter name -->
+  <section id="v-join" class="card hidden">
+    <label for="name"><strong>Enter your name</strong></label>
+    <div class="row" style="margin-top:8px">
+      <input type="text" id="name" maxlength="40" autocomplete="off" placeholder="First name and last initial">
+      <button class="btn" id="joinBtn">Join</button>
+    </div>
+    <p id="joinErr" class="err"></p>
+  </section>
+
+  <!-- Waiting -->
+  <section id="v-wait" class="card center hidden">
+    <p class="big-num">⏳</p>
+    <p id="waitMsg" style="font-size:1.1rem"></p>
+    <p class="muted" style="margin-bottom:0"><a href="#" id="changeName">Not you? Change name</a></p>
+  </section>
+
+  <!-- Question -->
+  <section id="v-question" class="hidden">
+    <div class="progress"><span id="qnum"></span><span id="who"></span></div>
     <div class="card">
       <div class="eq" id="eq"></div>
       <div class="step">Which method is best?</div>
-      <div class="opts two" id="methodOpts"></div>
-      <div id="methodFb"></div>
-      <div class="nav"><button class="btn" id="next" disabled>Next</button></div>
+      <div class="opts" id="methodOpts"></div>
+      <div id="sentMsg"></div>
     </div>
   </section>
 
-  <section id="results" class="hidden">
+  <!-- Reveal -->
+  <section id="v-reveal" class="hidden">
+    <div class="progress"><span id="rqnum"></span><span id="rwho"></span></div>
     <div class="card">
-      <p style="margin:0;text-align:center;color:var(--muted)">Your score</p>
-      <div class="score" id="final"></div>
-      <p style="text-align:center;margin-top:0" id="finalMsg"></p>
-      <table>
-        <thead><tr><th>#</th><th>Equation</th><th>Your method</th></tr></thead>
-        <tbody id="summary"></tbody>
-      </table>
-      <div class="nav"><button class="btn secondary" id="retry">Try again</button></div>
+      <div class="eq" id="req"></div>
+      <div id="yourResult"></div>
+      <div class="step" style="margin-top:18px">How the class did</div>
+      <div id="classResult"></div>
+      <p class="muted center" style="margin-bottom:0">Wait for your teacher to go to the next question.</p>
     </div>
   </section>
+
+  <!-- Done -->
+  <section id="v-done" class="card hidden">
+    <p class="center muted" style="margin:0">Quiz over! Your score</p>
+    <div class="score" id="final"></div>
+    <table>
+      <thead><tr><th>#</th><th>Equation</th><th>Your method</th></tr></thead>
+      <tbody id="summary"></tbody>
+    </table>
+  </section>
+
+  <p id="netErr" class="err center"></p>
 </main>
 
+<script src="config.js"></script>
+<script src="questions.js"></script>
+<script src="live-api.js"></script>
 <script>
-const METHODS = ["Square roots", "Factoring", "Quadratic formula"];
-
-// best: the most efficient method. ok: methods that also work well (full credit, with a tip).
-const QUESTIONS = [
-  {
-    eq: "x² = 49",
-    best: "Square roots", ok: [],
-    why: "There is no x-term, so just take the square root of both sides."
-  },
-  {
-    eq: "x² + 5x + 6 = 0",
-    best: "Factoring", ok: [],
-    why: "a = 1 and two numbers multiply to 6 and add to 5 (2 and 3), so it factors quickly."
-  },
-  {
-    eq: "(x − 3)² = 16",
-    best: "Square roots", ok: [],
-    why: "It is already a perfect square equal to a number. Square root both sides — don't expand!"
-  },
-  {
-    eq: "2x² + 3x − 7 = 0",
-    best: "Quadratic formula", ok: [],
-    why: "a ≠ 1 and the discriminant (65) is not a perfect square, so it won't factor. Use the formula."
-  },
-  {
-    eq: "x² + 6x − 5 = 0",
-    best: "Quadratic formula", ok: [],
-    why: "No factors of −5 add to 6, so it won't factor. Use the formula."
-  },
-  {
-    eq: "x² − 9x = 0",
-    best: "Factoring", ok: [],
-    why: "There is no constant term, so factor out the GCF, x."
-  },
-  {
-    eq: "3x² − 75 = 0",
-    best: "Square roots", ok: ["Factoring"],
-    tip: "Factoring 3(x − 5)(x + 5) works too, but isolating x² is quicker.",
-    why: "No x-term. Isolate x² and take the square root."
-  },
-  {
-    eq: "x² − 10x + 18 = 0",
-    best: "Quadratic formula", ok: [],
-    why: "No factors of 18 add to −10, so it won't factor. Use the formula."
-  },
-  {
-    eq: "2x² + x − 3 = 0",
-    best: "Factoring", ok: ["Quadratic formula"],
-    tip: "The formula works, but the discriminant is 25 (a perfect square), so it factors.",
-    why: "The discriminant 1 + 24 = 25 is a perfect square, so it factors: (2x + 3)(x − 1)."
-  },
-  {
-    eq: "5x² − 2x − 1 = 0",
-    best: "Quadratic formula", ok: [],
-    why: "a ≠ 1 and the discriminant (24) is not a perfect square. Use the formula."
-  },
-  {
-    eq: "4x² − 12x + 9 = 0",
-    best: "Factoring", ok: [],
-    why: "It is a perfect square trinomial: (2x)² − 2(2x)(3) + 3² = (2x − 3)²."
-  },
-  {
-    eq: "x² + 4x + 13 = 0",
-    best: "Quadratic formula", ok: [],
-    why: "The discriminant 16 − 52 = −36 is negative, so it won't factor. Use the formula (expect complex roots!)."
-  }
-];
-
 const $ = id => document.getElementById(id);
-let order, idx, results;
+const VIEWS = ["v-setup", "v-join", "v-wait", "v-question", "v-reveal", "v-done"];
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+};
 
-function shuffle(a) {
-  a = a.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+// A random ID so the backend can tell students apart, even with the same name.
+let myId = store.get("bm_id");
+if (!myId) { myId = "id" + Math.random().toString(36).slice(2, 10); store.set("bm_id", myId); }
+let myName = store.get("bm_name") || "";
+let joinedSession = null;
+let picks = {};        // question index → method, for the current session
+let state = null;
+let lastRender = "";
+let polling = false;
+
+function show(view) {
+  VIEWS.forEach(v => $(v).classList.toggle("hidden", v !== view));
+}
+
+function loadPicks(session) {
+  try { picks = JSON.parse(store.get("bm_picks_" + session + "_" + myId) || "{}"); } catch (e) { picks = {}; }
+}
+function savePicks() {
+  store.set("bm_picks_" + state.session + "_" + myId, JSON.stringify(picks));
+}
+
+async function join() {
+  const n = $("name").value.trim();
+  if (!n) { $("joinErr").textContent = "Please type your name."; return; }
+  myName = n;
+  store.set("bm_name", n);
+  $("joinErr").textContent = "";
+  lastRender = "";
+  poll();
+}
+
+async function ensureJoined() {
+  if (!state.session || joinedSession === state.session) return;
+  const r = await api.post({ action: "join", session: state.session, id: myId, name: myName });
+  if (r.ok) {
+    joinedSession = state.session;
+    loadPicks(state.session);
   }
-  return a;
 }
 
-function start() {
-  order = shuffle(QUESTIONS);
-  idx = 0;
-  results = [];
-  $("intro").classList.add("hidden");
-  $("results").classList.add("hidden");
-  $("quiz").classList.remove("hidden");
-  render();
-}
-
-function points() {
-  return results.reduce((s, r) => s + r.method, 0);
+async function poll() {
+  if (polling) return;
+  polling = true;
+  try {
+    state = await api.get({ action: "state" });
+    $("netErr").textContent = "";
+    if (myName && state.phase !== "off") await ensureJoined();
+    render();
+  } catch (e) {
+    $("netErr").textContent = "Having trouble connecting… retrying.";
+  } finally {
+    polling = false;
+  }
 }
 
 function render() {
-  const q = order[idx];
-  results[idx] = { q, method: 0, methodPick: null };
-  $("qnum").textContent = `Question ${idx + 1} of ${order.length}`;
-  $("running").textContent = `Score: ${points()} / ${idx}`;
-  $("barfill").style.width = `${(idx / order.length) * 100}%`;
-  $("eq").textContent = q.eq;
-  $("methodFb").innerHTML = "";
-  $("next").disabled = true;
-  $("next").textContent = idx === order.length - 1 ? "See results" : "Next";
+  const key = JSON.stringify([state.session, state.phase, state.q, !!myName, !!state.stats, picks[state.q]]);
+  if (key === lastRender) return;
+  lastRender = key;
 
-  const mo = $("methodOpts");
-  mo.innerHTML = "";
-  METHODS.forEach(m => {
-    const b = document.createElement("button");
-    b.className = "opt";
-    b.textContent = m;
-    b.onclick = () => pickMethod(m);
-    mo.appendChild(b);
-  });
-}
+  if (!myName) { show("v-join"); $("name").focus(); return; }
 
-function pickMethod(m) {
-  const q = order[idx], r = results[idx];
-  r.methodPick = m;
-  let cls, html;
-  if (m === q.best) {
-    r.method = 1; cls = "good";
-    html = `<strong>Yes!</strong> ${q.why}`;
-  } else if (q.ok.includes(m)) {
-    r.method = 1; cls = "ok";
-    html = `<strong>That works.</strong> ${q.tip}`;
-  } else {
-    cls = "bad";
-    html = `<strong>Not the best choice.</strong> Best method: <strong>${q.best}</strong>. ${q.why}`;
+  const total = state.total || QUESTIONS.length;
+  const q = QUESTIONS[state.q];
+  const label = `Question ${state.q + 1} of ${total}`;
+
+  if (state.phase === "off" || joinedSession !== state.session) {
+    show("v-wait");
+    $("waitMsg").textContent = `Hi ${myName}! Waiting for your teacher to start the quiz…`;
+  } else if (state.phase === "lobby") {
+    show("v-wait");
+    $("waitMsg").textContent = `You're in, ${myName}! Waiting for your teacher to show the first question…`;
+  } else if (state.phase === "question") {
+    show("v-question");
+    $("qnum").textContent = label;
+    $("who").textContent = myName;
+    $("eq").textContent = q.eq;
+    const picked = picks[state.q];
+    $("methodOpts").innerHTML = "";
+    METHODS.forEach(m => {
+      const b = document.createElement("button");
+      b.className = "opt" + (picked === m ? " sel-ok" : "");
+      b.textContent = m;
+      b.disabled = !!picked;
+      b.onclick = () => answer(m);
+      $("methodOpts").appendChild(b);
+    });
+    $("sentMsg").innerHTML = picked
+      ? `<div class="fb ok"><strong>Answer locked in.</strong> Wait for your teacher to reveal the results.</div>`
+      : "";
+  } else if (state.phase === "reveal") {
+    show("v-reveal");
+    $("rqnum").textContent = label;
+    $("rwho").textContent = myName;
+    $("req").textContent = q.eq;
+    const picked = picks[state.q];
+    let cls, html;
+    if (!picked) {
+      cls = "bad"; html = `<strong>You didn't answer.</strong> Best method: <strong>${q.best}</strong>. ${q.why}`;
+    } else if (picked === q.best) {
+      cls = "good"; html = `<strong>You got it!</strong> ${q.why}`;
+    } else if (q.ok.includes(picked)) {
+      cls = "ok"; html = `<strong>That works.</strong> ${q.tip}`;
+    } else {
+      cls = "bad"; html = `<strong>You picked ${picked}.</strong> Best method: <strong>${q.best}</strong>. ${q.why}`;
+    }
+    $("yourResult").innerHTML = `<div class="fb ${cls}">${html}</div>`;
+    $("classResult").innerHTML = splitBar(state.stats);
+  } else if (state.phase === "done") {
+    show("v-done");
+    const done = QUESTIONS.slice(0, state.q + 1);
+    let pts = 0;
+    $("summary").innerHTML = done.map((qq, i) => {
+      const p = picks[i];
+      const ok = p && isCorrect(qq, p);
+      if (ok) pts++;
+      return `<tr><td>${i + 1}</td><td class="math">${qq.eq}</td>
+        <td>${ok ? '<span class="tick">✓</span>' : '<span class="cross">✗</span>'} ${p ? escapeHtml(p) : "<em>no answer</em>"}
+        ${p !== qq.best ? `<br><small>Best: ${qq.best}</small>` : ""}</td></tr>`;
+    }).join("");
+    $("final").textContent = `${pts} / ${done.length}`;
   }
-  [...$("methodOpts").children].forEach(b => {
-    b.disabled = true;
-    if (b.textContent === m) b.classList.add("sel-" + cls);
-    else if (b.textContent === q.best) b.classList.add("reveal");
-  });
-  $("methodFb").innerHTML = `<div class="fb ${cls}">${html}</div>`;
-  $("running").textContent = `Score: ${points()} / ${idx + 1}`;
-  $("next").disabled = false;
 }
 
-
-function next() {
-  idx++;
-  if (idx < order.length) render();
-  else finish();
+function splitBar(s) {
+  if (!s || !s.answered) return `<p class="muted">No answers yet.</p>`;
+  const right = Math.round((s.correct / s.answered) * 100), wrong = 100 - right;
+  return `
+    <div class="legend"><span class="g">${right}% got it right</span><span class="b">${wrong}% got it wrong</span></div>
+    <div class="split"><div class="g" style="width:${right}%"></div><div class="b" style="width:${wrong}%"></div></div>
+    <p class="muted center" style="margin:0">${s.answered} student${s.answered === 1 ? "" : "s"} answered</p>`;
 }
 
-function mark(n, full) {
-  return n ? `<span class="${full ? "tick" : "half"}">✓</span>` : `<span class="cross">✗</span>`;
+async function answer(m) {
+  const q = QUESTIONS[state.q];
+  picks[state.q] = m;
+  savePicks();
+  lastRender = "";
+  render();
+  for (let tries = 0; tries < 4; tries++) {
+    try {
+      const r = await api.post({
+        action: "answer", session: state.session, id: myId, name: myName,
+        q: state.q, eq: q.eq, method: m, correct: isCorrect(q, m)
+      });
+      if (r.error === "closed") {
+        delete picks[state.q];
+        savePicks();
+        $("sentMsg").innerHTML = `<div class="fb bad">Too late — this question was already closed.</div>`;
+      }
+      return;
+    } catch (e) {
+      await new Promise(res => setTimeout(res, 1000 * (tries + 1)));
+    }
+  }
+  $("sentMsg").innerHTML = `<div class="fb bad">Couldn't send your answer. Check your connection and tell your teacher.</div>`;
 }
 
-function finish() {
-  $("quiz").classList.add("hidden");
-  $("results").classList.remove("hidden");
-  const total = order.length, pts = points();
-  const pct = Math.round((pts / total) * 100);
-  $("final").textContent = `${pts} / ${total} (${pct}%)`;
-  $("finalMsg").textContent =
-    pct >= 90 ? "Excellent — you know when to use each method!" :
-    pct >= 75 ? "Nice work. Review the ones you missed below." :
-    pct >= 50 ? "Getting there. Look over the method guide and try again." :
-                "Review the four methods and when to use each, then try again.";
-  $("summary").innerHTML = results.map((r, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td class="math">${r.q.eq}</td>
-      <td>${mark(r.method, r.methodPick === r.q.best)} ${r.methodPick}${r.methodPick !== r.q.best ? `<br><small>Best: ${r.q.best}</small>` : ""}</td>
-    </tr>`).join("");
-}
+$("joinBtn").onclick = join;
+$("changeName").onclick = e => {
+  e.preventDefault();
+  myName = "";
+  store.set("bm_name", "");
+  myId = "id" + Math.random().toString(36).slice(2, 10);
+  store.set("bm_id", myId);
+  joinedSession = null;
+  picks = {};
+  $("name").value = "";
+  lastRender = "";
+  render();
+};
+$("name").addEventListener("keydown", e => { if (e.key === "Enter") join(); });
 
-$("qcount").textContent = QUESTIONS.length;
-$("start").onclick = start;
-$("next").onclick = next;
-$("retry").onclick = start;
+if (!api.configured()) {
+  show("v-setup");
+} else {
+  if (myName) $("name").value = myName;
+  poll();
+  setInterval(poll, 2500);
+}
 </script>
 </body>
 </html>
