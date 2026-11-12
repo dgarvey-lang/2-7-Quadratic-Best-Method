@@ -6,10 +6,7 @@ An interactive, self-checking quiz (`index.html`) on picking the most efficient 
 - **Factoring**: the trinomial factors nicely, or there's no constant term (GCF)
 - **Quadratic formula**: works every time; best when it doesn't factor
 
-There are 12 questions, shown in random order. Each one has two steps:
-
-1. Choose the best method (1 point). A method that also works earns credit too, along with a tip about the faster one.
-2. Choose the correct solution(s) (1 point). The worked steps are shown after each answer.
+There are 12 questions, shown in random order. For each equation, students choose the best method (1 point) and get an explanation of why. A method that also works earns credit too, along with a tip about the faster one.
 
 A results table at the end lists each question and what the student missed.
 
@@ -20,4 +17,4 @@ A results table at the end lists each question and what the student missed.
 
 ## Editing questions
 
-The questions are in the `QUESTIONS` array near the bottom of `index.html`. Each entry sets the equation, the best method, any other acceptable methods, the correct answer, three wrong answers, and the worked solution.
+The questions are in the `QUESTIONS` array near the bottom of `index.html`. Each entry sets the equation, the best method, any other acceptable methods, and the explanation.
